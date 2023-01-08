@@ -6,12 +6,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.util.Map;
 
 @Service
+@Component
 public class UserService {
     @Autowired
     UserRepository userRepository;
@@ -23,8 +25,6 @@ public class UserService {
     ObjectMapper objectMapper;
 
     private final String REDIS_PREFIX_USER="user::";
-    @Value("${topic_name}")
-    private final String topicName="create_wallet";
 
     public void addUser(UserRequest userRequest) {
         User user=User.builder().userName(userRequest.getUserName())
@@ -33,10 +33,12 @@ public class UserService {
                 .name(userRequest.getName()).build();
         userRepository.save(user);
         saveInCache(user);
+        //kafka producer
         JSONObject jsonObject=new JSONObject();
         jsonObject.put("userName",user.getUserName());
-        kafkaTemplate.send(topicName,jsonObject.toString());
+        kafkaTemplate.send("create_wallet",jsonObject.toString());
     }
+    //cache
     public void saveInCache(User user){
         Map map=objectMapper.convertValue(user,Map.class);
         redisTemplate.opsForHash().putAll(REDIS_PREFIX_USER+user.getUserName(), map);
