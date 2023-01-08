@@ -47,7 +47,7 @@ public class TransactionService {
     }
     //kafka consumer
     //listening to wallet service
-    @KafkaListener(topics = {"update_transaction"},groupId = "create_transaction")
+    @KafkaListener(topics = {"update_transaction"},groupId = "updateTransaction")
     public void updateTransaction(String msg) throws JsonProcessingException {
     JSONObject jsonObject=objectMapper.readValue(msg, JSONObject.class);
     String status= (String) jsonObject.get("status");
