@@ -1,11 +1,9 @@
 package com.example.services;
 
+import com.sun.istack.NotNull;
 import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.UUID;
 
@@ -15,10 +13,12 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 @Entity
+@ToString
 public class Transaction implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+    @Column(nullable = false)
     private String transactionId= UUID.randomUUID().toString();
     private String fromUser;
     private String toUser;

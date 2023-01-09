@@ -42,6 +42,7 @@ public class WalletService {
         String fromUser= (String) jsonObject.get("fromUser");
         String toUser= (String) jsonObject.get("toUser");
         String transactionId= (String) jsonObject.get("transactionId");
+        System.out.println("transactionId in WS"+transactionId);//null
         int amount= (int) jsonObject.get("amount");
         Wallet sender=walletRepository.findByUserName(fromUser);
         int balance=sender.getAmount();

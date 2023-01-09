@@ -12,7 +12,7 @@ public class TransactionController {
         transactionService.createTransaction(transactionRequest);
     }
     @GetMapping("/transaction/{transactionId}")
-    private Transaction getTransaction(@RequestParam("transactionId")String id){
+    private Transaction getTransaction(@PathVariable("transactionId")String id){
         return transactionService.getTransaction(id);
     }
 }

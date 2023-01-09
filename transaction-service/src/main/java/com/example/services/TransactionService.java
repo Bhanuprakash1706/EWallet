@@ -15,6 +15,8 @@ import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
 import java.util.Date;
+import java.util.Objects;
+import java.util.UUID;
 
 
 @Service
@@ -34,9 +36,11 @@ public class TransactionService {
                 .toUser(transactionRequest.getToUser())
                 .amount(transactionRequest.getAmount())
                 .status(TransactionStatus.PENDING)
+                .transactionId(String.valueOf(UUID.randomUUID()))
                 .transactionTime(new Date().toString())
                 .build();
         transactionRepository.save(transaction);
+        System.out.println("1 Transaction in TS"+transaction);
         //kafka
         JSONObject jsonObject=new JSONObject();
         jsonObject.put("fromUser",transaction.getFromUser());
@@ -53,12 +57,15 @@ public class TransactionService {
     String status= (String) jsonObject.get("status");
     String transactionId= (String) jsonObject.get("transactionId");
     Transaction transaction=transactionRepository.findByTransactionId(transactionId);
-    if(status=="SUCCESS"){
+
+    if(Objects.equals(status, "SUCCESS")){
         transaction.setStatus(TransactionStatus.SUCCESS);
     }else{
         transaction.setStatus(TransactionStatus.FAILED);
     }
     transactionRepository.save(transaction);
+    System.out.println("TransactionStatus in TS "+status);
+    System.out.println("2 Transaction in TS"+transaction);
     callNotificationService(transaction);
     }
     public void callNotificationService(Transaction transaction){
