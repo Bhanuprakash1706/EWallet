@@ -22,7 +22,7 @@ public class EmailService {
         JSONObject jsonObject=objectMapper.readValue(msg,JSONObject.class);
         String email= (String) jsonObject.get("email");
         String message= (String) jsonObject.get("message");
-        simpleMailMessage.setFrom("ewallet@gmail.com");
+        simpleMailMessage.setFrom("mulintibhanuprakashreddy@gmail.com");
         simpleMailMessage.setTo(email);
         simpleMailMessage.setSubject("Transaction Email");
         simpleMailMessage.setText(message);
