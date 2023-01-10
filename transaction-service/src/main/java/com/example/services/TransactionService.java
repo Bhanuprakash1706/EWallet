@@ -80,25 +80,25 @@ public class TransactionService {
         String senderEmail= (String) sender.get("email");
 
         //receiver
-        url=URI.create("http://localhost:8076/user?userName="+fromUser);
+        url=URI.create("http://localhost:8076/user?userName="+toUser);
         JSONObject receiver=restTemplate.exchange(url, HttpMethod.GET,httpEntity,JSONObject.class).getBody();
-        String receiverName= (String) sender.get("name");
-        String receiverEmail= (String) sender.get("email");
+        String receiverName= (String) receiver.get("name");
+        String receiverEmail= (String) receiver.get("email");
         //sender Notification
         JSONObject senderEmailRequest=new JSONObject();
         senderEmailRequest.put("email",senderEmail);
-        String sendMessage=String.format("Hi %s, Your transaction with transactionId %s to %s of amount %d is in %s status.",senderName,transaction.getTransactionId(),receiverName,transaction.getAmount(),transaction.getStatus());
+        String sendMessage=String.format("Hi %s,\nYour transaction with transactionId %s to %s of amount %d is in %s status(Debited).",senderName,transaction.getTransactionId(),receiverName,transaction.getAmount(),transaction.getStatus());
         senderEmailRequest.put("message",sendMessage);
         kafkaTemplate.send("create_notification",senderEmailRequest.toString());
         //receiver
-        if(transaction.getStatus()==TransactionStatus.FAILED){
+        if(Objects.equals(transaction.getStatus(),TransactionStatus.FAILED)){
             return;
         }
-            JSONObject receiverEmailRequest=new JSONObject();
-            receiverEmailRequest.put("email",receiverEmail);
-            String receiverMessage=String.format("Hi %s, You have received %d rupees from %s",receiverName,transaction.getAmount(),senderName);
-            senderEmailRequest.put("message",receiverMessage);
-            kafkaTemplate.send("create_notification",receiverEmailRequest.toString());
+        JSONObject receiverEmailRequest=new JSONObject();
+        receiverEmailRequest.put("email",receiverEmail);
+        String receiverMessage=String.format("Hi %s,\nYou have received %d rupees from %s, kindly check your wallet and use this money for your usefull needs, don't waste it",receiverName,transaction.getAmount(),senderName);
+        receiverEmailRequest.put("message",receiverMessage);
+        kafkaTemplate.send("create_notification",receiverEmailRequest.toString());
 
     }
     public Transaction getTransaction(String id) {
